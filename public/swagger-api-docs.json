@@ -1,0 +1,914 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Query Report Builder API",
+    "description": "API untuk membuat, mengelola, dan mengeksekusi query report secara dinamis. API ini memungkinkan user untuk membuat report dengan parameter, menyimpannya, dan mengeksekusi kapan saja dengan parameter yang berbeda.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "API Support",
+      "email": "support@queryreport.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Development Server (Local)"
+    },
+    {
+      "url": "https://192.168.30.70:8080",
+      "description": "Development Server (Network)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Endpoints untuk autentikasi dan manajemen user"
+    },
+    {
+      "name": "Query Report",
+      "description": "Endpoints untuk CRUD dan eksekusi query report"
+    }
+  ],
+  "paths": {
+    "/api/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login pengguna",
+        "description": "Endpoint untuk autentikasi user dengan username dan password. Session akan dibuat setelah login berhasil.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "admin",
+                    "description": "Username pengguna"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "admin123",
+                    "description": "Password pengguna"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login berhasil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": {
+                      "type": "object",
+                      "properties": {
+                        "ID": {
+                          "type": "string",
+                          "example": "PTG001"
+                        },
+                        "UID": {
+                          "type": "string",
+                          "example": "16156151515"
+                        },
+                        "Nama": {
+                          "type": "string",
+                          "example": "Muhammad Nur Amin"
+                        },
+                        "Organisasi": {
+                          "type": "integer",
+                          "example": 787878
+                        },
+                        "HakAkses": {
+                          "type": "object",
+                          "properties": {
+                            "reporting": {
+                              "type": "array",
+                              "items": {
+                                "type": "object"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Username atau password tidak diisi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Username atau password salah",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout pengguna",
+        "description": "Endpoint untuk logout pengguna. Session akan dihapus.",
+        "responses": {
+          "200": {
+            "description": "Logout berhasil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "Logout berhasil"
+                        }
+                      }
+                    },
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/profile": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get profil pengguna yang sedang login",
+        "description": "Endpoint untuk mendapatkan informasi profil pengguna yang sedang login. Memerlukan session aktif.",
+        "responses": {
+          "200": {
+            "description": "Berhasil mendapatkan profil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": {
+                      "$ref": "#/components/schemas/UserProfile"
+                    },
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - belum login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/queryreport/create": {
+      "post": {
+        "tags": ["Query Report"],
+        "summary": "Membuat query report baru",
+        "description": "Endpoint untuk membuat query report baru. Hanya query SELECT yang diperbolehkan untuk keamanan.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["namaReport", "querySql"],
+                "properties": {
+                  "namaReport": {
+                    "type": "string",
+                    "example": "Laporan Penjualan",
+                    "description": "Nama report"
+                  },
+                  "querySql": {
+                    "type": "string",
+                    "example": "SELECT * FROM sales WHERE date = :tanggal",
+                    "description": "Query SQL (hanya SELECT). Gunakan :namaParameter untuk parameter"
+                  },
+                  "catatan": {
+                    "type": "string",
+                    "example": "Catatan untuk laporan ini",
+                    "description": "Deskripsi atau catatan report"
+                  },
+                  "idOrganisasi": {
+                    "type": "string",
+                    "example": "ORG001",
+                    "description": "ID Organisasi pemilik report"
+                  },
+                  "parameter": {
+                    "type": "array",
+                    "description": "Definisi parameter yang digunakan dalam query",
+                    "items": {
+                      "type": "object",
+                      "required": ["name", "type", "label"],
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "example": "tanggal",
+                          "description": "Nama parameter (sesuai dengan :namaParameter di query)"
+                        },
+                        "type": {
+                          "type": "string",
+                          "example": "date",
+                          "enum": ["string", "integer", "date", "datetime"],
+                          "description": "Tipe data parameter"
+                        },
+                        "label": {
+                          "type": "string",
+                          "example": "Tanggal",
+                          "description": "Label untuk tampilan user"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report berhasil dibuat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": {
+                      "type": "object",
+                      "properties": {
+                        "kode": {
+                          "type": "string",
+                          "example": "REP20251127001001",
+                          "description": "Kode unik report yang di-generate otomatis"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Report berhasil dibuat"
+                        }
+                      }
+                    },
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Input tidak valid atau bukan SELECT query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/queryreport/getall": {
+      "post": {
+        "tags": ["Query Report"],
+        "summary": "Mendapatkan semua query report",
+        "description": "Endpoint untuk mendapatkan semua query report dengan filter optional (idOrganisasi, stAktif, search).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idOrganisasi": {
+                    "type": "string",
+                    "example": "ORG001",
+                    "description": "Filter berdasarkan ID Organisasi"
+                  },
+                  "stAktif": {
+                    "type": "integer",
+                    "example": 1,
+                    "enum": [0, 1],
+                    "description": "Filter berdasarkan status aktif (1=Aktif, 0=Tidak Aktif)"
+                  },
+                  "search": {
+                    "type": "string",
+                    "example": "penjualan",
+                    "description": "Cari berdasarkan nama report"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Berhasil mendapatkan data report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/QueryReport"
+                      }
+                    },
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/queryreport/getbykode": {
+      "post": {
+        "tags": ["Query Report"],
+        "summary": "Mendapatkan query report berdasarkan kode",
+        "description": "Endpoint untuk mendapatkan detail query report berdasarkan kode unik.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["kode"],
+                "properties": {
+                  "kode": {
+                    "type": "string",
+                    "example": "REP20251127001001",
+                    "description": "Kode unik report"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Berhasil mendapatkan data report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": {
+                      "$ref": "#/components/schemas/QueryReport"
+                    },
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Report tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/queryreport/getbyorganisasi": {
+      "post": {
+        "tags": ["Query Report"],
+        "summary": "Mendapatkan query report berdasarkan organisasi",
+        "description": "Endpoint untuk mendapatkan semua query report berdasarkan ID organisasi.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["idOrganisasi"],
+                "properties": {
+                  "idOrganisasi": {
+                    "type": "string",
+                    "example": "ORG001",
+                    "description": "ID Organisasi"
+                  },
+                  "stAktif": {
+                    "type": "integer",
+                    "example": 1,
+                    "enum": [0, 1],
+                    "description": "Filter berdasarkan status aktif"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Berhasil mendapatkan data report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/QueryReport"
+                      }
+                    },
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/queryreport/update": {
+      "put": {
+        "tags": ["Query Report"],
+        "summary": "Update query report",
+        "description": "Endpoint untuk mengupdate query report berdasarkan kode. Field yang tidak diisi tidak akan diupdate.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["kode"],
+                "properties": {
+                  "kode": {
+                    "type": "string",
+                    "example": "REP20251127001001",
+                    "description": "Kode report yang akan diupdate"
+                  },
+                  "namaReport": {
+                    "type": "string",
+                    "example": "Laporan Penjualan Updated"
+                  },
+                  "querySql": {
+                    "type": "string",
+                    "example": "SELECT * FROM sales WHERE date = :tanggal"
+                  },
+                  "catatan": {
+                    "type": "string",
+                    "example": "Catatan updated"
+                  },
+                  "idOrganisasi": {
+                    "type": "string",
+                    "example": "ORG001"
+                  },
+                  "stAktif": {
+                    "type": "integer",
+                    "example": 1,
+                    "enum": [0, 1]
+                  },
+                  "parameter": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "label": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report berhasil diupdate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "Report berhasil diupdate"
+                        }
+                      }
+                    },
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Report tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/queryreport/delete": {
+      "delete": {
+        "tags": ["Query Report"],
+        "summary": "Hapus query report (soft delete)",
+        "description": "Endpoint untuk menghapus query report (soft delete - set stAktif = 0). Data tidak benar-benar dihapus dari database.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["kode"],
+                "properties": {
+                  "kode": {
+                    "type": "string",
+                    "example": "REP20251127001001",
+                    "description": "Kode report yang akan dihapus"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report berhasil dihapus",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "Report berhasil dihapus"
+                        }
+                      }
+                    },
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Report tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/queryreport/execute": {
+      "post": {
+        "tags": ["Query Report"],
+        "summary": "Execute query report",
+        "description": "Endpoint untuk mengeksekusi query report dengan parameter yang diperlukan. Report harus dalam status aktif (stAktif = 1).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["kode"],
+                "properties": {
+                  "kode": {
+                    "type": "string",
+                    "example": "REP20251127001003",
+                    "description": "Kode report yang akan dieksekusi"
+                  },
+                  "paramValues": {
+                    "type": "object",
+                    "description": "Nilai parameter yang dibutuhkan oleh query. Key harus sesuai dengan nama parameter yang didefinisikan.",
+                    "example": {
+                      "tanggal": "2025-11-01",
+                      "organisasi": "ORG001"
+                    },
+                    "additionalProperties": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Query berhasil dieksekusi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": {
+                      "type": "object",
+                      "properties": {
+                        "reportId": {
+                          "type": "string",
+                          "example": "REP20251127001003",
+                          "description": "Kode report yang dieksekusi"
+                        },
+                        "nama": {
+                          "type": "string",
+                          "example": "Laporan Penjualan per Tanggal",
+                          "description": "Nama report"
+                        },
+                        "data": {
+                          "type": "array",
+                          "description": "Hasil eksekusi query",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": true
+                          },
+                          "example": [
+                            {
+                              "tanggal": "2025-11-01",
+                              "produk": "Laptop Dell",
+                              "jumlah": 2,
+                              "harga": "15000000.00",
+                              "total": "30000000.00",
+                              "customer": "PT ABC"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parameter tidak lengkap atau report tidak aktif",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Report tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error saat eksekusi query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Metadata": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "OK",
+            "description": "Status message"
+          },
+          "code": {
+            "type": "integer",
+            "example": 200,
+            "description": "HTTP status code"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "response": {
+            "nullable": true,
+            "example": null,
+            "description": "Response data (null untuk error)"
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "example": "Error message",
+                "description": "Pesan error"
+              },
+              "code": {
+                "type": "integer",
+                "example": 400,
+                "description": "HTTP status code"
+              }
+            }
+          }
+        }
+      },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "example": "PTG001",
+            "description": "User ID"
+          },
+          "UID": {
+            "type": "string",
+            "example": "16156151515",
+            "description": "Unique ID"
+          },
+          "Nama": {
+            "type": "string",
+            "example": "Muhammad Nur Amin",
+            "description": "Nama lengkap user"
+          },
+          "Organisasi": {
+            "type": "integer",
+            "example": 787878,
+            "description": "ID Organisasi"
+          },
+          "HakAkses": {
+            "type": "object",
+            "description": "Hak akses user",
+            "properties": {
+              "reporting": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "QueryReport": {
+        "type": "object",
+        "properties": {
+          "kode": {
+            "type": "string",
+            "example": "REP20251127001001",
+            "description": "Kode unik report"
+          },
+          "namaReport": {
+            "type": "string",
+            "example": "Laporan Penjualan",
+            "description": "Nama report"
+          },
+          "querySql": {
+            "type": "string",
+            "example": "SELECT * FROM sales WHERE date = :tanggal",
+            "description": "Query SQL"
+          },
+          "parameter": {
+            "type": "array",
+            "description": "Definisi parameter",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "tanggal"
+                },
+                "type": {
+                  "type": "string",
+                  "example": "date"
+                },
+                "label": {
+                  "type": "string",
+                  "example": "Tanggal"
+                }
+              }
+            }
+          },
+          "catatan": {
+            "type": "string",
+            "example": "Catatan report",
+            "description": "Deskripsi atau catatan"
+          },
+          "idOrganisasi": {
+            "type": "string",
+            "example": "ORG001",
+            "description": "ID Organisasi pemilik"
+          },
+          "stAktif": {
+            "type": "integer",
+            "example": 1,
+            "enum": [0, 1],
+            "description": "Status aktif (1=Aktif, 0=Tidak Aktif)"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-11-27 10:00:00",
+            "description": "Tanggal dibuat"
+          },
+          "createdBy": {
+            "type": "string",
+            "example": "admin",
+            "description": "User yang membuat"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-11-27 12:00:00",
+            "description": "Tanggal terakhir diupdate"
+          },
+          "updatedBy": {
+            "type": "string",
+            "example": "admin",
+            "description": "User yang terakhir mengupdate"
+          }
+        }
+      }
+    }
+  }
+}

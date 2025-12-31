@@ -1,0 +1,379 @@
+{
+  "info": {
+    "name": "Query Report API",
+    "description": "Collection untuk testing Query Report Builder API - CodeIgniter 4",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/login",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user\",\n  \"password\": \"user123\"\n}"
+            },
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/login",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/profile",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/logout",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Query Report",
+      "item": [
+        {
+          "name": "Get All Reports",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idOrganisasi\": \"ORG001\",\n  \"stAktif\": 1\n}"
+            },
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/queryreport/getall",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "queryreport", "getall"]
+            }
+          }
+        },
+        {
+          "name": "Get All Reports (No Filter)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/queryreport/getall",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "queryreport", "getall"]
+            }
+          }
+        },
+        {
+          "name": "Get Report by Kode",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kode\": \"REP20251127001001\"\n}"
+            },
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/queryreport/getbykode",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "queryreport", "getbykode"]
+            }
+          }
+        },
+        {
+          "name": "Get Reports by Organisasi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idOrganisasi\": \"ORG001\",\n  \"stAktif\": 1\n}"
+            },
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/queryreport/getbyorganisasi",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "queryreport", "getbyorganisasi"]
+            }
+          }
+        },
+        {
+          "name": "Create Report - Simple",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"namaReport\": \"Laporan Test Sederhana\",\n  \"querySql\": \"SELECT Kode, NamaReport, CreatedAt FROM TQueryReport WHERE StAktif = 1\",\n  \"catatan\": \"Laporan test tanpa parameter\",\n  \"idOrganisasi\": \"ORG001\"\n}"
+            },
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/queryreport/create",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "queryreport", "create"]
+            }
+          }
+        },
+        {
+          "name": "Create Report - With Parameters",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"namaReport\": \"Laporan Penjualan Custom\",\n  \"querySql\": \"SELECT * FROM TSales WHERE tanggal >= :tgl_mulai AND tanggal <= :tgl_akhir AND organisasi = :org\",\n  \"catatan\": \"Laporan penjualan dengan filter tanggal dan organisasi\",\n  \"idOrganisasi\": \"ORG001\",\n  \"parameter\": [\n    {\n      \"name\": \"tgl_mulai\",\n      \"type\": \"date\",\n      \"label\": \"Tanggal Mulai\"\n    },\n    {\n      \"name\": \"tgl_akhir\",\n      \"type\": \"date\",\n      \"label\": \"Tanggal Akhir\"\n    },\n    {\n      \"name\": \"org\",\n      \"type\": \"string\",\n      \"label\": \"ID Organisasi\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/queryreport/create",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "queryreport", "create"]
+            }
+          }
+        },
+        {
+          "name": "Update Report",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kode\": \"REP20251127001001\",\n  \"namaReport\": \"Laporan Semua Report (Updated)\",\n  \"catatan\": \"Catatan yang sudah diupdate\"\n}"
+            },
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/queryreport/update",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "queryreport", "update"]
+            }
+          }
+        },
+        {
+          "name": "Delete Report (Soft Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kode\": \"REP20251127001001\"\n}"
+            },
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/queryreport/delete",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "queryreport", "delete"]
+            }
+          }
+        },
+        {
+          "name": "Execute Report - No Parameters",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kode\": \"REP20251127001001\"\n}"
+            },
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/queryreport/execute",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "queryreport", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Execute Report - With Parameters",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kode\": \"REP20251127001003\",\n  \"paramValues\": {\n    \"tanggal\": \"2025-11-01\",\n    \"organisasi\": \"ORG001\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/queryreport/execute",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "queryreport", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Execute Report - Total Sales",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kode\": \"REP20251127001004\",\n  \"paramValues\": {\n    \"organisasi\": \"ORG001\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/queryreport/execute",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "queryreport", "execute"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documentation",
+      "item": [
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/docs",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "docs"]
+            }
+          }
+        },
+        {
+          "name": "Swagger JSON",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://192.168.30.70:8080/api/docs/swagger.json",
+              "protocol": "http",
+              "host": ["192.168.30.70"],
+              "port": "8080",
+              "path": ["api", "docs", "swagger.json"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

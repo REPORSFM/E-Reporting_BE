@@ -1,0 +1,109 @@
+╔══════════════════════════════════════════════════════════════╗
+║          SWAGGER DOKUMENTASI - QUICK ACCESS                  ║
+╚══════════════════════════════════════════════════════════════╝
+
+✅ SOLUSI ERROR "Failed to fetch" / CORS:
+   Jangan buka file HTML langsung!
+   Akses via HTTP server di bawah ini:
+
+╔══════════════════════════════════════════════════════════════╗
+║  AKSES DOKUMENTASI API                                       ║
+╚══════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────┐
+│  1. SWAGGER UI (Interactive)                                │
+├─────────────────────────────────────────────────────────────┤
+│  Local:   http://localhost:8080/api-documentation.html     │
+│  Network: http://192.168.30.70:8080/api-documentation.html │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  2. ReDoc (Modern & Clean)                                  │
+├─────────────────────────────────────────────────────────────┤
+│  Local:   http://localhost:8080/api-documentation-redoc.html│
+│  Network: http://192.168.30.70:8080/api-documentation-redoc.html│
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  3. JSON Specification                                      │
+├─────────────────────────────────────────────────────────────┤
+│  Local:   http://localhost:8080/swagger-api-docs.json      │
+│  Network: http://192.168.30.70:8080/swagger-api-docs.json  │
+└─────────────────────────────────────────────────────────────┘
+
+╔══════════════════════════════════════════════════════════════╗
+║  CARA MENGGUNAKAN                                            ║
+╚══════════════════════════════════════════════════════════════╝
+
+1. Pastikan Apache berjalan (atau jalankan PHP server)
+2. Buka browser (Chrome, Firefox, Edge)
+3. Akses salah satu URL di atas
+4. Try out API langsung dari browser!
+
+╔══════════════════════════════════════════════════════════════╗
+║  ENDPOINTS AVAILABLE                                         ║
+╚══════════════════════════════════════════════════════════════╝
+
+Authentication:
+  • POST   /api/login           - Login user
+  • POST   /api/logout          - Logout user
+  • GET    /api/profile         - Get profile
+
+Query Report:
+  • POST   /api/queryreport/create            - Create report
+  • POST   /api/queryreport/getall            - Get all reports
+  • POST   /api/queryreport/getbykode         - Get by kode
+  • POST   /api/queryreport/getbyorganisasi   - Get by organisasi
+  • PUT    /api/queryreport/update            - Update report
+  • DELETE /api/queryreport/delete            - Delete report
+  • POST   /api/queryreport/execute           - Execute report
+
+╔══════════════════════════════════════════════════════════════╗
+║  TROUBLESHOOTING                                             ║
+╚══════════════════════════════════════════════════════════════╝
+
+❌ Error "Failed to fetch"?
+   → Jangan buka file HTML langsung dari folder
+   → Akses via http://localhost:8080/api-documentation.html
+
+❌ 404 Not Found?
+   → Pastikan Apache berjalan
+   → Cek: netstat -ano | findstr :8080
+
+❌ Tidak bisa akses dari komputer lain?
+   → Setup Apache Virtual Host
+   → Lihat file: SETUP_INSTRUKSI.md
+
+╔══════════════════════════════════════════════════════════════╗
+║  ALTERNATIVE                                                 ║
+╚══════════════════════════════════════════════════════════════╝
+
+Online Swagger Editor:
+  1. Buka: https://editor.swagger.io/
+  2. File → Import File
+  3. Pilih: swagger-api-docs.json
+  4. Done!
+
+Import ke Postman:
+  1. Postman → Import
+  2. Upload: swagger-api-docs.json
+  3. Collection auto-generated!
+
+╔══════════════════════════════════════════════════════════════╗
+║  QUICK START                                                 ║
+╚══════════════════════════════════════════════════════════════╝
+
+Buka browser sekarang dan akses:
+
+    http://localhost:8080/api-documentation.html
+
+Lalu:
+  1. Expand "Authentication" → "POST /api/login"
+  2. Klik "Try it out"
+  3. Klik "Execute"
+  4. Lihat response!
+
+═══════════════════════════════════════════════════════════════
+
+Created: 27 November 2025
+File: QUICK_ACCESS.txt
