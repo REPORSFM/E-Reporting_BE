@@ -8,6 +8,20 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 
 /**
+ * CORS Preflight Handler - Must be before other routes
+ * This catches all OPTIONS requests for CORS preflight
+ * Using (.*) to match multi-segment paths like /api/queryreport/create
+ */
+$routes->options('(.*)', static function () {
+    $response = service('response');
+    $response->setHeader('Access-Control-Allow-Origin', '*');
+    $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    $response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN, Accept');
+    $response->setHeader('Access-Control-Max-Age', '3600');
+    return $response->setStatusCode(200);
+});
+
+/**
  * Authentication Routes
  */
 $routes->group('api', function($routes) {

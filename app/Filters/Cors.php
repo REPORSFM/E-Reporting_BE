@@ -26,11 +26,11 @@ class Cors implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         // Handle preflight requests
-        if ($request->getMethod() === 'options') {
+        if (strtoupper($request->getMethod()) === 'OPTIONS') {
             $response = service('response');
             $response->setHeader('Access-Control-Allow-Origin', '*');
-            $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-            $response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
+            $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+            $response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN, Accept');
             $response->setHeader('Access-Control-Max-Age', '3600');
             $response->setStatusCode(200);
             return $response;
@@ -52,8 +52,8 @@ class Cors implements FilterInterface
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
         $response->setHeader('Access-Control-Allow-Origin', '*');
-        $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        $response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
+        $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+        $response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN, Accept');
         $response->setHeader('Access-Control-Expose-Headers', 'Authorization');
         
         return $response;
